@@ -27,7 +27,6 @@
 #define DATA_ELEMENTMAP_H
 
 #include "FCGlobal.h"
-#include "IndexedName.h"
 
 namespace Data {
 
