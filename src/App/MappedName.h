@@ -892,7 +892,6 @@ public:
 
     /// Extract tag and other information from a encoded element name
     ///
-    /// \param name: encoded element name
     /// \param tag: optional pointer to receive the extracted tag
     /// \param len: optional pointer to receive the length field after the tag field.
     ///             This gives the length of the previous hashsed element name starting
@@ -904,10 +903,8 @@ public:
     /// \param recursive: recursively find the last non-zero tag
     ///
     /// \return Return the end position of the tag field, or return -1 if not found.
-    static int findTagInElementName(const MappedName& name, long* tag = 0, int* len = 0,
-                                    const char* postfix = 0, char* type = 0, bool negative = false,
-                                    bool recursive = true);
-
+    int findTagInElementName(long* tag = 0, int* len = 0, const char* postfix = 0, char* type = 0,
+                             bool negative = false, bool recursive = true) const;
 
     /// Get a hash for this MappedName
     std::size_t hash() const
