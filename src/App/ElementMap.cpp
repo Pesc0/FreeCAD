@@ -501,7 +501,7 @@ MappedName ElementMap::addName(MappedName& name, const IndexedName& idx, const E
                    bool overwrite, IndexedName* existing)
 {
     if (FC_LOG_INSTANCE.isEnabled(FC_LOGLEVEL_LOG)) {
-        if (name.find("#") >= 0 && MappedName::findTagInElementName(name) < 0) {
+        if (name.find("#") >= 0 && name.findTagInElementName() < 0) {
             FC_ERR("missing tag postfix " << name);
         }
     }
@@ -565,8 +565,7 @@ IndexedName ElementMap::find(const MappedName& name, ElementIDRefs* sids) const
             return IndexedName();
 
         int len = 0;
-        if (MappedName::findTagInElementName(
-                name, nullptr, &len, nullptr, nullptr, false, false)
+        if (name.findTagInElementName(nullptr, &len, nullptr, nullptr, false, false)
             < 0)
             return IndexedName();
         QByteArray key = name.toRawBytes(len);
@@ -721,8 +720,8 @@ void ElementMap::hashChildMaps(ComplexGeoData& master)
             auto& child = vv.second;
             int len = 0;
             long tag;
-            int pos = MappedName::findTagInElementName(
-                MappedName::fromRawData(child.postfix), &tag, &len, nullptr, nullptr, false, false);
+            int pos = MappedName::fromRawData(child.postfix).findTagInElementName(
+                &tag, &len, nullptr, nullptr, false, false);
             if (pos > 10) {
                 MappedName postfix = master.hashElementName(
                     MappedName::fromRawData(child.postfix.constData(), pos), child.sids);

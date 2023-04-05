@@ -37,6 +37,7 @@
 
 FC_LOG_LEVEL_INIT("MappedName", true, 2);
 
+namespace Data {
 
 void MappedName::compact()
 {
@@ -57,12 +58,11 @@ void MappedName::compact()
 }
 
 
-static int MappedName::findTagInElementName(const MappedName& name, long* tag = 0, int* len = 0,
-                                const char* postfix = 0, char* type = 0, bool negative = false,
-                                bool recursive = true)
+int MappedName::findTagInElementName(long* tag, int* len, const char* postfix,
+                                     char* type, bool negative, bool recursive) const
 {
     bool hex = true;
-    int pos = name.rfind(POSTFIX_TAG);
+    int pos = this->rfind(POSTFIX_TAG);
 
     // Example name, tagPosfix == ;:H
     // #94;:G0;XTR;:H19:8,F;:H1a,F;BND:-1:0;:H1b:10,F
@@ -71,7 +71,7 @@ static int MappedName::findTagInElementName(const MappedName& name, long* tag = 
     //                                    pos
 
     if(pos < 0) {
-        pos = name.rfind(POSTFIX_DECIMAL_TAG); //FIXME inconsistent
+        pos = this->rfind(POSTFIX_DECIMAL_TAG); //FIXME inconsistent
         if (pos < 0)
             return -1;
         hex = false;
@@ -85,7 +85,7 @@ static int MappedName::findTagInElementName(const MappedName& name, long* tag = 
     char eof = 0;
 
     int size;
-    const char *s = name.toConstString(offset, size);
+    const char *s = this->toConstString(offset, size);
 
     // check if the number followed by the tagPosfix is negative
     bool isNegative = (s[0] == '-');
@@ -156,7 +156,7 @@ static int MappedName::findTagInElementName(const MappedName& name, long* tag = 
         if (_len && recursive && (tag || len)) {
             // in case of recursive tag postfix (used by hierarchy element
             // map), look for any embedded tag postifx
-            int next = MappedName::fromRawData(name, pos-_len, _len).rfind(POSTFIX_TAG);
+            int next = MappedName::fromRawData(*this, pos-_len, _len).rfind(POSTFIX_TAG);
             if (next >= 0) {
                 next += pos - _len;
                 // #94;:G0;XTR;:H19:8,F;:H1a,F;BND:-1:0;:H1b:10,F
@@ -171,8 +171,7 @@ static int MappedName::findTagInElementName(const MappedName& name, long* tag = 
                 if (pos == next)
                     end = -1;
                 else
-                    end = MappedName::fromRawData(
-                        name, next+1, pos-next-1).find(ELEMENT_MAP_PREFIX);
+                    end = MappedName::fromRawData(*this, next+1, pos-next-1).find(ELEMENT_MAP_PREFIX);
                 if (end >= 0) {
                     end += next+1;
                     // #94;:G0;XTR;:H19:8,F;:H1a,F;BND:-1:0;:H1b:10,F
@@ -199,8 +198,7 @@ static int MappedName::findTagInElementName(const MappedName& name, long* tag = 
         *type = tp;
     if(tag) {
         if (_tag == 0 && recursive)
-            return findTagInElementName(
-                        MappedName(name, 0, _len), tag, len, postfix, type, negative);
+            return MappedName(*this, 0, _len).findTagInElementName(tag, len, postfix, type, negative);
         if(_tag>0 || negative)
             *tag = _tag;
         else
@@ -209,9 +207,8 @@ static int MappedName::findTagInElementName(const MappedName& name, long* tag = 
     if(len)
         *len = _len;
     if(postfix)
-        name.toString(*postfix, pos);
+        this->toString(*postfix, pos);
     return pos;
 }
 
-
-
+}
