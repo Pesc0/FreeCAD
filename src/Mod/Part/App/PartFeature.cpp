@@ -64,7 +64,7 @@
 #include "PartFeaturePy.h"
 #include "PartPyCXX.h"
 #include "TopoShapePy.h"
-
+#include "PostfixStringReferences.h"
 
 using namespace Part;
 namespace bp = boost::placeholders;
@@ -413,7 +413,7 @@ static TopoShape _getTopoShape(const App::DocumentObject *obj, const char *subna
                     continue;
             }else{
                 if(link && !link->getShowElementValue())
-                    shape = baseShape.makeTransform(mat,(TopoShape::indexPostfix()+childName).c_str());
+                    shape = baseShape.makeTransform(mat,(Data::POSTFIX_INDEX + childName).c_str());
                 else {
                     shape = baseShape.makeTransform(mat);
                 }

@@ -101,7 +101,7 @@
 #include "TopoShapeShellPy.h"
 #include "TopoShapeSolidPy.h"
 #include "TopoShapeWirePy.h"
-
+#include "PostfixStringReferences.h"
 
 #ifdef FCUseFreeType
 #  include "FT2FC.h"
@@ -2318,7 +2318,7 @@ private:
             subname += '.';
         if (mapped && mapped[0]) {
             if (!Data::ComplexGeoData::isMappedElement(mapped))
-                subname += Data::ComplexGeoData::elementMapPrefix();
+                subname += Data::ELEMENT_MAP_PREFIX;
             subname += mapped;
         }
         if (element && element[0]) {
