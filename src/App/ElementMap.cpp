@@ -140,6 +140,7 @@ void ElementMap::encodeElementName(char element_type,
 
 MappedName ElementMap::setElementName(const IndexedName & element,
                                           const MappedName & name,
+                                          ElementMapPtr &elementMap,
                                           ComplexGeoData& master,
                                           const ElementIDRefs *sid,
                                           bool overwrite)
@@ -147,7 +148,8 @@ MappedName ElementMap::setElementName(const IndexedName & element,
     if(!element)
         throw Base::ValueError("Invalid input");
     if(!name)  {
-        this->erase(element);
+        if(elementMap)
+            elementMap->erase(element);
         return MappedName();
     }
 
@@ -161,8 +163,8 @@ MappedName ElementMap::setElementName(const IndexedName & element,
         if(c == '.' || std::isspace((int)c))
             FC_THROWM(Base::RuntimeError,"Illegal character in element name: " << element);
     }
-
-    resetElementMap(std::make_shared<ElementMap>());
+    if(!elementMap)
+        elementMap = std::make_shared<ElementMap>();
 
     ElementIDRefs _sid;
     if (!sid)
@@ -172,7 +174,7 @@ MappedName ElementMap::setElementName(const IndexedName & element,
     Data::MappedName n(name);
     for(int i=0;;) {
         IndexedName existing;
-        MappedName res = this->addName(n, element, *sid, overwrite, &existing);
+        MappedName res = elementMap->addName(n, element, *sid, overwrite, &existing);
         if (res)
             return res;
         if (++i == 100) {
@@ -919,7 +921,7 @@ void ElementMap::hashChildMaps(ComplexGeoData& master)
                 MappedName postfix = hashElementName(
                     MappedName::fromRawData(child.postfix.constData(), pos), child.sids);
                 ss.str("");
-                ss << MappedChildElements::prefix() << postfix;
+                ss << MAPPED_CHILD_ELEMENTS_PREFIX << postfix;
                 MappedName tmp;
                 encodeElementName(
                     child.indexedName[0], tmp, ss, nullptr, master, nullptr, child.tag, true);
@@ -931,7 +933,7 @@ void ElementMap::hashChildMaps(ComplexGeoData& master)
     }
 }
 
-void ElementMap::addChildElements(ComplexGeoData& master, const std::vector<MappedChildElements>& children)
+void ElementMap::addChildElements(ElementMapPtr& elementMap, ComplexGeoData& master, const std::vector<MappedChildElements>& children)
 {
     std::ostringstream ss;
     ss << std::hex;
@@ -1064,7 +1066,7 @@ void ElementMap::addChildElements(ComplexGeoData& master, const std::vector<Mapp
                 ss.str("");
                 encodeElementName(
                     idx[0], name, ss, &sids, master, child.postfix.constData(), child.tag);
-                setElementName(idx, name, master, &sids);
+                setElementName(idx, name, elementMap, master, &sids);
             }
             continue;
         }
@@ -1107,7 +1109,7 @@ void ElementMap::addChildElements(ComplexGeoData& master, const std::vector<Mapp
     }
 }
 
-std::vector<MappedChildElements> ElementMap::getChildElements() const
+std::vector<ElementMap::MappedChildElements> ElementMap::getChildElements() const
 {
     std::vector<MappedChildElements> res;
     res.reserve(this->childElements.size());
