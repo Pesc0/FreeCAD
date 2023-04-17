@@ -45,13 +45,19 @@ class ElementMap;
 typedef std::shared_ptr<ElementMap> ElementMapPtr;
 
 
-class ElementMap: public std::enable_shared_from_this<ElementMap> //TODO can remove shared_from_this?
+class ElementMap: public std::enable_shared_from_this<ElementMap>
 {
 public:
     ElementMap();
 
+    /** Ensures that this->_id is properly assigned. Then marks as "used" all the StringID
+     * that are used to make up this particular map and are stored in the hasher passed
+     * as a parameter. Finally do this recursively for all childEelementMaps as well.
+     * 
+     * @param hasher where all the StringID needed to build the map are stored.
+    */
     void beforeSave(const ::App::StringHasherRef& hasher) const;
-    
+
     void save(std::ostream& s, int index, const std::map<const ElementMap*, int>& childMapSet,
               const std::map<QByteArray, int>& postfixMap) const;
 
@@ -141,7 +147,7 @@ public:
                           std::vector<const ElementMap*>& childMaps,
                           std::map<QByteArray, int>& postfixMap,
                           std::vector<QByteArray>& postfixes) const;
-                          
+
     struct AppExport MappedChildElements
     {
         IndexedName indexedName;
@@ -152,10 +158,11 @@ public:
         QByteArray postfix;
         ElementIDRefs sids;
 
-        //prefix() has been moved to PostfixStringReferences.h
+        // prefix() has been moved to PostfixStringReferences.h
     };
 
-    void addChildElements(ElementMapPtr& elementMap, ComplexGeoData& master, const std::vector<MappedChildElements>& children);
+    void addChildElements(ElementMapPtr& elementMap, ComplexGeoData& master,
+                          const std::vector<MappedChildElements>& children);
 
     std::vector<MappedChildElements> getChildElements() const;
 
