@@ -55,6 +55,7 @@
 #include <App/FeaturePythonPyImp.h>
 #include <App/Link.h>
 #include <App/GeoFeatureGroupExtension.h>
+#include <App/PostfixStringReferences.h>
 #include <Base/Exception.h>
 #include <Base/Placement.h>
 #include <Base/Rotation.h>
@@ -64,7 +65,6 @@
 #include "PartFeaturePy.h"
 #include "PartPyCXX.h"
 #include "TopoShapePy.h"
-#include "PostfixStringReferences.h"
 
 using namespace Part;
 namespace bp = boost::placeholders;

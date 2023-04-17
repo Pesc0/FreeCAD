@@ -74,6 +74,7 @@
 #include <App/Application.h>
 #include <App/Document.h>
 #include <App/DocumentObjectPy.h>
+#include <App/PostfixStringReferences.h>
 #include <Base/Console.h>
 #include <Base/Exception.h>
 #include <Base/FileInfo.h>
@@ -101,7 +102,6 @@
 #include "TopoShapeShellPy.h"
 #include "TopoShapeSolidPy.h"
 #include "TopoShapeWirePy.h"
-#include "PostfixStringReferences.h"
 
 #ifdef FCUseFreeType
 #  include "FT2FC.h"
