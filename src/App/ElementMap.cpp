@@ -474,15 +474,18 @@ void ElementMap::addPostfix(const QByteArray& postfix, std::map<QByteArray, int>
     }
 }
 
-MappedName ElementMap::setElementName(const IndexedName& element, const MappedName& name,
-                                      ElementMapPtr& elementMap, long masterTag,
-                                      const ElementIDRefs* sid, bool overwrite)
+MappedName ElementMap::setElementName(const IndexedName& element,
+                                      const MappedName& name,
+                                      ElementMapPtr& currentElementMap,
+                                      long masterTag,
+                                      const ElementIDRefs* sid,
+                                      bool overwrite)
 {
     if (!element)
         throw Base::ValueError("Invalid input");
     if (!name) {
-        if (elementMap)
-            elementMap->erase(element);
+        if (currentElementMap)
+            currentElementMap->erase(element);
         return MappedName();
     }
 
@@ -496,8 +499,8 @@ MappedName ElementMap::setElementName(const IndexedName& element, const MappedNa
         if (c == '.' || std::isspace((int)c))
             FC_THROWM(Base::RuntimeError, "Illegal character in element name: " << element);
     }
-    if (!elementMap)
-        elementMap = std::make_shared<ElementMap>();
+    if (!currentElementMap)
+        currentElementMap = std::make_shared<ElementMap>();
 
     ElementIDRefs _sid;
     if (!sid)
@@ -507,7 +510,7 @@ MappedName ElementMap::setElementName(const IndexedName& element, const MappedNa
     Data::MappedName n(name);
     for (int i = 0;;) {
         IndexedName existing;
-        MappedName res = elementMap->addName(n, element, *sid, overwrite, &existing);
+        MappedName res = currentElementMap->addName(n, element, *sid, overwrite, &existing);
         if (res)
             return res;
         if (++i == 100) {
@@ -867,9 +870,9 @@ void ElementMap::hashChildMaps(long masterTag)
     if (childElements.empty() || !this->hasher)
         return;
     std::ostringstream ss;
-    for (auto& v : this->indexedNames) {
-        for (auto& vv : v.second.children) {
-            auto& child = vv.second;
+    for (auto& indexedNameIndexedElements : this->indexedNames) {
+        for (auto& indexedChild : indexedNameIndexedElements.second.children) {
+            auto& child = indexedChild.second;
             int len = 0;
             long tag;
             int pos = MappedName::fromRawData(child.postfix)
