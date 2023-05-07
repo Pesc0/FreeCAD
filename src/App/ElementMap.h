@@ -144,7 +144,6 @@ public:
      */
     MappedName setElementName(const IndexedName& element,
                               const MappedName& name,
-                              ElementMapPtr& currentElementMap,
                               long masterTag,
                               const ElementIDRefs* sid = nullptr,
                               bool overwrite = false);
@@ -284,6 +283,7 @@ private:
 
     /// String hasher for element name shortening
     App::StringHasherRef hasher;
+    void init();
 };
 
 
