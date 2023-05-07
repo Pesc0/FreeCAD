@@ -865,14 +865,14 @@ bool ElementMap::hasChildElementMap() const
     return !childElements.empty();
 }
 
-void ElementMap::hashChildMaps(long masterTag)
+void ElementMap::hashChildMaps(ComplexGeoData& master)
 {
     if (childElements.empty() || !this->hasher)
         return;
     std::ostringstream ss;
-    for (auto& indexedNameIndexedElements : this->indexedNames) {
-        for (auto& indexedChild : indexedNameIndexedElements.second.children) {
-            auto& child = indexedChild.second;
+    for (auto& v : this->indexedNames) {
+        for (auto& vv : v.second.children) {
+            auto& child = vv.second;
             int len = 0;
             long tag;
             int pos = MappedName::fromRawData(child.postfix)
@@ -884,7 +884,7 @@ void ElementMap::hashChildMaps(long masterTag)
                 ss << MAPPED_CHILD_ELEMENTS_PREFIX << postfix;
                 MappedName tmp;
                 encodeElementName(
-                    child.indexedName[0], tmp, ss, nullptr, masterTag, nullptr, child.tag, true);
+                    child.indexedName[0], tmp, ss, nullptr, master, nullptr, child.tag, true);
                 this->childElements.remove(child.postfix);
                 child.postfix = tmp.toBytes();
                 this->childElements[child.postfix].childMap = &child;
@@ -919,7 +919,7 @@ void ElementMap::collectChildMaps(std::map<const ElementMap*, int>& childMapSet,
     res.first->second = (int)childMaps.size();
 }
 
-void ElementMap::addChildElements(ElementMapPtr& elementMap, long masterTag,
+void ElementMap::addChildElements(ElementMapPtr& elementMap, ComplexGeoData& master,
                                   const std::vector<MappedChildElements>& children)
 {
     std::ostringstream ss;
