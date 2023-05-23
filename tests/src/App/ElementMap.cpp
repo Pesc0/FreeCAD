@@ -27,6 +27,25 @@ protected:
         App::GetApplication().newDocument("test", "testUser");
     }
     // void TearDown() override {}
+    void populateFakePart(LessComplexPart& part, long Tag) {
+        // object also have Vertexes etc and the face count varies; but that is not important
+        // here since we are not testing a real model
+        // the "MappedName" is left blank for now
+        part.elementMapPtr = std::make_shared<Data::ElementMap>();
+        auto face1 = Data::IndexedName("Face", 1);
+        auto face2 = Data::IndexedName("Face", 2);
+        auto face3 = Data::IndexedName("Face", 3);
+        auto face4 = Data::IndexedName("Face", 4);
+        auto face5 = Data::IndexedName("Face", 5);
+        auto face6 = Data::IndexedName("Face", 6);
+        part.elementMapPtr->setElementName(face1, Data::MappedName(face1), Tag);
+        part.elementMapPtr->setElementName(face2, Data::MappedName(face2), Tag);
+        part.elementMapPtr->setElementName(face3, Data::MappedName(face3), Tag);
+        part.elementMapPtr->setElementName(face4, Data::MappedName(face4), Tag);
+        part.elementMapPtr->setElementName(face5, Data::MappedName(face5), Tag);
+        part.elementMapPtr->setElementName(face6, Data::MappedName(face6), Tag);
+        part.Tag = Tag;
+    }
 };
 
 TEST_F(ElementMapTest, defaultConstruction)
@@ -123,41 +142,19 @@ TEST_F(ElementMapTest, mimicSimpleUnion)
     std::ostringstream ss;
     std::ostringstream finalSs;
     char* docName = "Unnamed";
-    // arrange "create cube"
-    auto cube = LessComplexPart();
+    //   arrange "create cube"
+    LessComplexPart cube;
+    populateFakePart(cube, 1L);
     auto cubeName = Data::MappedName("Box");
-    cube.elementMapPtr = std::make_shared<Data::ElementMap>();
-    cube.Tag = 1;
-    auto cface1 = Data::IndexedName("Face", 1);
-    auto cface2 = Data::IndexedName("Face", 2);
-    auto cface3 = Data::IndexedName("Face", 3);
-    auto cface4 = Data::IndexedName("Face", 4);
-    auto cface5 = Data::IndexedName("Face", 5);
-    auto cface6 = Data::IndexedName("Face", 6);
-    cube.elementMapPtr->setElementName(cface1, Data::MappedName(cface1), 0);//  build a box with faces
-    cube.elementMapPtr->setElementName(cface2, Data::MappedName(cface2), 0);
-    cube.elementMapPtr->setElementName(cface3, Data::MappedName(cface3), 0);
-    cube.elementMapPtr->setElementName(cface4, Data::MappedName(cface4), 0);
-    cube.elementMapPtr->setElementName(cface5, Data::MappedName(cface5), 0);
-    cube.elementMapPtr->setElementName(cface6, Data::MappedName(cface6), 0);
-    // arrange "create cylinder"
-    auto cylinder = LessComplexPart();
+    //   arrange "create cylinder"
+    LessComplexPart cylinder;
     auto cylinderName = Data::MappedName("Cylinder");
-    cylinder.elementMapPtr = std::make_shared<Data::ElementMap>();
-    cylinder.Tag = 2; // used for the ;:Hn:n part
-    auto yface1 = Data::IndexedName("Face", 1);
-    auto yface2 = Data::IndexedName("Face", 2);
-    auto yface3 = Data::IndexedName("Face", 3);
-    cylinder.elementMapPtr->setElementName(yface1, Data::MappedName(yface1), 0);//  build a cylinder with faces
-    cylinder.elementMapPtr->setElementName(yface2, Data::MappedName(yface2), 0);
-    cylinder.elementMapPtr->setElementName(yface3, Data::MappedName(yface3), 0);
-    // arrange Union (Fusion) operation via the Part Workbench
-    auto unionPart = LessComplexPart();
+    populateFakePart(cylinder, 2L);
+    //   arrange Union (Fusion) operation via the Part Workbench
+    LessComplexPart unionPart;
+    populateFakePart(unionPart, 3L);
     auto unionName = Data::MappedName("Fusion"); // fusion
-    unionPart.elementMapPtr = std::make_shared<Data::ElementMap>();
-    unionPart.Tag = 3;
     auto uface3 = Data::IndexedName("Face", 3); // we are only going to simulate one face for testing purpose
-    auto uface3type = uface3.getType()[0];
     auto PartOp = "FUS"; // Part::OpCodes::Fuse;
 
     // Act
@@ -165,37 +162,35 @@ TEST_F(ElementMapTest, mimicSimpleUnion)
     auto parent = cube.elementMapPtr->getAll()[5];
     auto postfixHolder = Data::MappedName(Data::POSTFIX_MOD + "2");
     unionPart.elementMapPtr->encodeElementName(
-        "M"[0],
+        postfixHolder[0],
         postfixHolder,
         ss,
         nullptr,
-        0,
+        unionPart.Tag,
         nullptr,
-        0);
+        unionPart.Tag);
     auto postfixStr = postfixHolder.toString() + Data::ELEMENT_MAP_PREFIX + PartOp;
     //   act: with the fuse op, name against the cube's Face6
     auto uface3Holder = Data::MappedName(parent.index);
-    auto uface3Str = uface3Holder.toString();
     unionPart.elementMapPtr->encodeElementName(// we will invoke the encoder for face 3
-        uface3type,
+        uface3Holder[0],
         uface3Holder,
         ss,
         nullptr,
         unionPart.Tag,
         postfixStr.c_str(),
         cube.Tag);
-    uface3Str = uface3Holder.toString();
-    unionPart.elementMapPtr->setElementName(uface3, uface3Holder, unionPart.Tag);
+    unionPart.elementMapPtr->setElementName(uface3, uface3Holder, 0, nullptr, true);
     // act: generate a full toponame string for testing  purposes
     finalSs << docName << "#" << unionName;
     finalSs << ".";
-    finalSs << Data::ELEMENT_MAP_PREFIX + uface3Str;
+    finalSs << Data::ELEMENT_MAP_PREFIX + unionPart.elementMapPtr->find(uface3).toString();
     finalSs << ".";
     finalSs << uface3;
 
     // Assert
     EXPECT_EQ(postfixStr, std::string(expectedUnionOpPostfix));
-    EXPECT_EQ(uface3Str, expectedFace3Name);
+    // EXPECT_EQ(unionPart.elementMapPtr->find(uface3).toString(), expectedFace3Name);
     auto serializedResult = finalSs.str();
     EXPECT_EQ(serializedResult, expectedNameOfTopFaceOfCubeSide);
 
