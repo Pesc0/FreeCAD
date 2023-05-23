@@ -53,7 +53,7 @@ typedef std::shared_ptr<ElementMap> ElementMapPtr;
  *   possibly a recursive elementmap
  * `mappedNames` maps a MappedName to a specific IndexedName.
  */
-class ElementMap: public std::enable_shared_from_this<ElementMap>
+class ElementMap: public std::enable_shared_from_this<ElementMap> //TODO can remove shared_from_this?
 {
 public:
     /** Default constructor: hooks internal functions to \c signalSaveDocument and 
@@ -72,13 +72,13 @@ public:
     void beforeSave(const ::App::StringHasherRef& hasher) const;
 
     /** Serialize this map. Calls \c collectChildMaps to get \c childMapSet and
-     * \c postfixMap, then calls the other save function with those parameters.
+     * \c postfixMap, then calls the other (private) save function with those parameters.
      * @param s: serialized stream 
     */
     void save(std::ostream& s) const;
 
     /** Deserialize and restore this map. This function restores \c childMaps and 
-     * \c postfixes from the stream, then calls the other restore function with those 
+     * \c postfixes from the stream, then calls the other (private) restore function with those 
      * parameters.
      * @param hasher: where all the StringIDs are stored
      * @param s: stream to deserialize
@@ -241,9 +241,7 @@ private:
 
     /* Note: the original addChildElements passed `ComplexGeoData& master` for getting the `Tag`,
      *   now it just passes `long masterTag`.*/
-    void addChildElements(ElementMapPtr& elementMap,
-                          long masterTag,
-                          const std::vector<MappedChildElements>& children);
+    void addChildElements(long masterTag, const std::vector<MappedChildElements>& children);
 
     std::vector<MappedChildElements> getChildElements() const;
 

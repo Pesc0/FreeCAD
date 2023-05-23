@@ -265,7 +265,7 @@ ElementMapPtr ElementMap::restore(::App::StringHasherRef hasher, std::istream& s
         } while (tmp != "EndMap");
         return map;
     }
-    map = shared_from_this();
+    map = shared_from_this(); //FIXME does nothing?
 
     const char* hasherWarn = nullptr;
     const char* hasherIDWarn = nullptr;
@@ -489,8 +489,7 @@ MappedName ElementMap::setElementName(const IndexedName& element,
     if (!element)
         throw Base::ValueError("Invalid input");
     if (!name) {
-        if (this)
-            erase(element);
+        erase(element);
         return MappedName();
     }
 
@@ -504,8 +503,6 @@ MappedName ElementMap::setElementName(const IndexedName& element,
         if (c == '.' || std::isspace((int)c))
             FC_THROWM(Base::RuntimeError, "Illegal character in element name: " << element);
     }
-    if (!this)
-        init();
 
     ElementIDRefs _sid;
     if (!sid)
@@ -934,8 +931,7 @@ void ElementMap::collectChildMaps(std::map<const ElementMap*, int>& childMapSet,
     res.first->second = (int)childMaps.size();
 }
 
-void ElementMap::addChildElements(ElementMapPtr& elementMap, long masterTag,
-                                  const std::vector<MappedChildElements>& children)
+void ElementMap::addChildElements(long masterTag, const std::vector<MappedChildElements>& children)
 {
     std::ostringstream ss;
     ss << std::hex;
