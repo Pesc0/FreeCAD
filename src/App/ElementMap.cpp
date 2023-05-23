@@ -10,6 +10,7 @@
 #include <boost/algorithm/string/split.hpp>
 
 #include <unordered_map>
+#include <random>
 
 
 FC_LOG_LEVEL_INIT("ElementMap", true, 2);
@@ -650,8 +651,18 @@ MappedName ElementMap::renameDuplicateElement(int index, const IndexedName& elem
                                               const IndexedName& element2, const MappedName& name,
                                               ElementIDRefs& sids, long masterTag)
 {
+    int idx;
+#ifdef FC_DEBUG
+    idx = index;
+#else
+    static std::random_device _RD;
+    static std::mt19937 _RGEN(_RD());
+    static std::uniform_int_distribution<> _RDIST(1,10000);
+    (void)index;
+    idx = _RDIST(_RGEN);
+#endif
     std::ostringstream ss;
-    ss << ELEMENT_MAP_PREFIX << 'D' << std::hex << index;
+    ss << ELEMENT_MAP_PREFIX << 'D' << std::hex << idx;
     MappedName renamed(name);
     encodeElementName(element.getType()[0], renamed, ss, &sids, masterTag);
     if (FC_LOG_INSTANCE.isEnabled(FC_LOGLEVEL_LOG))

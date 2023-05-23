@@ -71,15 +71,6 @@ public:
     // FIXME this should be made part of \c save, to achieve symmetry with the restore method
     void beforeSave(const ::App::StringHasherRef& hasher) const;
 
-    /** Serialize this map
-     * @param s: serialized stream 
-     * @param childMapSet: where all child element maps are stored
-     * @param postfixMap. where all postfixes are stored
-    */
-    // FIXME this should be made private I think
-    void save(std::ostream& s, int index, const std::map<const ElementMap*, int>& childMapSet,
-              const std::map<QByteArray, int>& postfixMap) const;
-
     /** Serialize this map. Calls \c collectChildMaps to get \c childMapSet and
      * \c postfixMap, then calls the other save function with those parameters.
      * @param s: serialized stream 
@@ -94,17 +85,6 @@ public:
     */
     ElementMapPtr restore(::App::StringHasherRef hasher, std::istream& s);
 
-    /** Deserialize and restore this map.
-     * @param hasher: where all the StringIDs are stored
-     * @param s: stream to deserialize
-     * @param childMaps: where all child element maps are stored
-     * @param postfixes. where all postfixes are stored
-    */
-    // FIXME this should be made private I think
-    ElementMapPtr restore(::App::StringHasherRef hasher, std::istream& s,
-                          std::vector<ElementMapPtr>& childMaps,
-                          const std::vector<std::string>& postfixes);
-
     /** Associate the MappedName \c name with the IndexedName \c idx.
      * @param name: the name to add
      * @param idx: the indexed name that \c name will be bound to
@@ -116,13 +96,6 @@ public:
      */
     MappedName addName(MappedName& name, const IndexedName& idx, const ElementIDRefs& sids,
                        bool overwrite, IndexedName* existing);
-
-    /** Utility function that adds \c postfix to \c postfixMap, and to \c postfixes
-     * if it was not present in the map. 
-    */
-    //FIXME this should be private probably
-    static void addPostfix(const QByteArray& postfix, std::map<QByteArray, int>& postfixMap,
-                           std::vector<QByteArray>& postfixes);
 
     /** Add a sub-element name mapping.
      *
@@ -175,14 +148,6 @@ public:
     /// Reverse hashElementName()
     MappedName dehashElementName(const MappedName& name) const;
 
-    /* Note: the original proc passed `ComplexGeoData& master` for getting the `Tag`,
-     *   now it just passes `long masterTag`.*/
-    // FIXME this is called only once from SetElementName, so it should probably be private. 
-    // TODO Realthunder modified this function recently adding a RNG. Should it be mirrored here? 
-    // https://github.com/realthunder/FreeCAD/commit/3acf7f6ae02be5f55cab468802cb3dbc825294a9
-    virtual MappedName renameDuplicateElement(int index, const IndexedName& element,
-                                              const IndexedName& element2, const MappedName& name,
-                                              ElementIDRefs& sids, long masterTag);
     /** Remove \c name from the map
     */
     bool erase(const MappedName& name);
@@ -209,14 +174,6 @@ public:
     std::vector<MappedElement> findAllStartsWith(const char *prefix) const;
 #endif
 
-    //FIXME duplicate code? as in copy/paste
-    //FIXME referenced only internally, should probably be private
-    const MappedNameRef* findMappedRef(const IndexedName& idx) const;
-    MappedNameRef* findMappedRef(const IndexedName& idx);
-
-    //FIXME referenced only once should be private
-    MappedNameRef& mappedRef(const IndexedName& idx);
-
     bool hasChildElementMap() const;
 
     /* Ensures that for each IndexedName mapped to IndexedElements, that
@@ -227,7 +184,43 @@ public:
      */
     void hashChildMaps(long masterTag);
 
-    //FIXME from here below should all be private
+private:
+    /** Serialize this map
+     * @param s: serialized stream 
+     * @param childMapSet: where all child element maps are stored
+     * @param postfixMap. where all postfixes are stored
+    */
+    void save(std::ostream& s, int index, const std::map<const ElementMap*, int>& childMapSet,
+              const std::map<QByteArray, int>& postfixMap) const;
+
+    /** Deserialize and restore this map.
+     * @param hasher: where all the StringIDs are stored
+     * @param s: stream to deserialize
+     * @param childMaps: where all child element maps are stored
+     * @param postfixes. where all postfixes are stored
+    */
+    ElementMapPtr restore(::App::StringHasherRef hasher, std::istream& s,
+                          std::vector<ElementMapPtr>& childMaps,
+                          const std::vector<std::string>& postfixes);
+
+    /** Utility function that adds \c postfix to \c postfixMap, and to \c postfixes
+     * if it was not present in the map. 
+    */
+    static void addPostfix(const QByteArray& postfix, std::map<QByteArray, int>& postfixMap,
+                           std::vector<QByteArray>& postfixes);
+
+    /* Note: the original proc passed `ComplexGeoData& master` for getting the `Tag`,
+     *   now it just passes `long masterTag`.*/
+    virtual MappedName renameDuplicateElement(int index, const IndexedName& element,
+                                              const IndexedName& element2, const MappedName& name,
+                                              ElementIDRefs& sids, long masterTag);
+
+    //FIXME duplicate code? as in copy/paste
+    const MappedNameRef* findMappedRef(const IndexedName& idx) const;
+    MappedNameRef* findMappedRef(const IndexedName& idx);
+
+    MappedNameRef& mappedRef(const IndexedName& idx);
+
     void collectChildMaps(std::map<const ElementMap*, int>& childMapSet,
                           std::vector<const ElementMap*>& childMaps,
                           std::map<QByteArray, int>& postfixMap,
@@ -256,7 +249,6 @@ public:
 
     std::vector<MappedElement> getAll() const;
 
-private:
     struct CStringComp
     {
     public:
