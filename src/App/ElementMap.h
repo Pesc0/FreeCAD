@@ -184,6 +184,27 @@ public:
      */
     void hashChildMaps(long masterTag);
 
+    struct AppExport MappedChildElements
+    {
+        IndexedName indexedName;
+        int count;
+        int offset;
+        long tag;
+        ElementMapPtr elementMap;
+        QByteArray postfix;
+        ElementIDRefs sids;
+
+        // prefix() has been moved to PostfixStringReferences.h
+    };
+
+    /* Note: the original addChildElements passed `ComplexGeoData& master` for getting the `Tag`,
+     *   now it just passes `long masterTag`.*/
+    void addChildElements(long masterTag, const std::vector<MappedChildElements>& children);
+
+    std::vector<MappedChildElements> getChildElements() const;
+
+    std::vector<MappedElement> getAll() const;
+
 private:
     /** Serialize this map
      * @param s: serialized stream 
@@ -225,27 +246,6 @@ private:
                           std::vector<const ElementMap*>& childMaps,
                           std::map<QByteArray, int>& postfixMap,
                           std::vector<QByteArray>& postfixes) const;
-
-    struct AppExport MappedChildElements
-    {
-        IndexedName indexedName;
-        int count;
-        int offset;
-        long tag;
-        ElementMapPtr elementMap;
-        QByteArray postfix;
-        ElementIDRefs sids;
-
-        // prefix() has been moved to PostfixStringReferences.h
-    };
-
-    /* Note: the original addChildElements passed `ComplexGeoData& master` for getting the `Tag`,
-     *   now it just passes `long masterTag`.*/
-    void addChildElements(long masterTag, const std::vector<MappedChildElements>& children);
-
-    std::vector<MappedChildElements> getChildElements() const;
-
-    std::vector<MappedElement> getAll() const;
 
     struct CStringComp
     {
