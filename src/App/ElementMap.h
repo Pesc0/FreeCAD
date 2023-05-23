@@ -177,6 +177,9 @@ public:
 
     /* Note: the original proc passed `ComplexGeoData& master` for getting the `Tag`,
      *   now it just passes `long masterTag`.*/
+    // FIXME this is called only once from SetElementName, so it should probably be private. 
+    // TODO Realthunder modified this function recently adding a RNG. Should it be mirrored here? 
+    // https://github.com/realthunder/FreeCAD/commit/3acf7f6ae02be5f55cab468802cb3dbc825294a9
     virtual MappedName renameDuplicateElement(int index, const IndexedName& element,
                                               const IndexedName& element2, const MappedName& name,
                                               ElementIDRefs& sids, long masterTag);
@@ -206,9 +209,12 @@ public:
     std::vector<MappedElement> findAllStartsWith(const char *prefix) const;
 #endif
 
+    //FIXME duplicate code? as in copy/paste
+    //FIXME referenced only internally, should probably be private
     const MappedNameRef* findMappedRef(const IndexedName& idx) const;
     MappedNameRef* findMappedRef(const IndexedName& idx);
 
+    //FIXME referenced only once should be private
     MappedNameRef& mappedRef(const IndexedName& idx);
 
     bool hasChildElementMap() const;
@@ -221,6 +227,7 @@ public:
      */
     void hashChildMaps(long masterTag);
 
+    //FIXME from here below should all be private
     void collectChildMaps(std::map<const ElementMap*, int>& childMapSet,
                           std::vector<const ElementMap*>& childMaps,
                           std::map<QByteArray, int>& postfixMap,
