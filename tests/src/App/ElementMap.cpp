@@ -25,6 +25,7 @@ protected:
         App::Application::Config()["ExeName"] = "FreeCAD";
         App::Application::init(argc, argv);
         App::GetApplication().newDocument("test", "testUser");
+        sids = &_sid;
     }
     // void TearDown() override {}
     void populateFakePart(LessComplexPart& part, long Tag) {
@@ -46,6 +47,8 @@ protected:
         part.elementMapPtr->setElementName(face6, Data::MappedName(face6), Tag);
         part.Tag = Tag;
     }
+    Data::ElementIDRefs _sid;
+    QVector<App::StringIDRef>* sids;
 };
 
 TEST_F(ElementMapTest, defaultConstruction)
@@ -62,13 +65,28 @@ TEST_F(ElementMapTest, setElementNameDefaults)
     // Arrange
     Data::MappedName mappedName("TEST");
     Data::IndexedName element("Edge", 1);
-    Data::ElementIDRefs _sid;
-    auto sids = &_sid;
     Data::MappedName expectedName("TEST");
     Data::ElementMap elementMap;
 
     // Act
-    auto resultName = elementMap.setElementName(element, mappedName, 0);
+    auto resultName = elementMap.setElementName(element, mappedName, 0, sids);
+
+    // Assert
+    EXPECT_EQ(resultName, expectedName);
+    auto mappedToElement = elementMap.find(element);
+    EXPECT_EQ(mappedToElement, mappedName);
+}
+
+TEST_F(ElementMapTest, setElementNameWithHashing)
+{
+    // Arrange
+    Data::MappedName mappedName("TEST");
+    Data::IndexedName element("Edge", 1);
+    Data::MappedName expectedName("TEST");
+    Data::ElementMap elementMap;
+
+    // Act
+    auto resultName = elementMap.setElementName(element, mappedName, 0, sids);
 
     // Assert
     EXPECT_EQ(resultName, expectedName);
@@ -136,9 +154,6 @@ TEST_F(ElementMapTest, mimicSimpleUnion)
 {
     // Arrange
     //   pattern: new doc, create Cube, create Cylinder, Union of both (Cube first)
-    const char* expectedNameOfTopFaceOfCubeSide = "Unnamed#Fusion.;Face6;:M2;FUS;:H1:8,F.Face3";
-    const char* expectedUnionOpPostfix = ":M2;FUS";
-    const char* expectedFace3Name = "Face6;:M2;FUS;:H1:8,F";
     std::ostringstream ss;
     std::ostringstream finalSs;
     char* docName = "Unnamed";
@@ -180,7 +195,7 @@ TEST_F(ElementMapTest, mimicSimpleUnion)
         unionPart.Tag,
         postfixStr.c_str(),
         cube.Tag);
-    unionPart.elementMapPtr->setElementName(uface3, uface3Holder, 0, nullptr, true);
+    unionPart.elementMapPtr->setElementName(uface3, uface3Holder, unionPart.Tag, nullptr, true);
     // act: generate a full toponame string for testing  purposes
     finalSs << docName << "#" << unionName;
     finalSs << ".";
@@ -189,9 +204,12 @@ TEST_F(ElementMapTest, mimicSimpleUnion)
     finalSs << uface3;
 
     // Assert
+    const char* expectedUnionOpPostfix = ":M2;FUS";
     EXPECT_EQ(postfixStr, std::string(expectedUnionOpPostfix));
-    // EXPECT_EQ(unionPart.elementMapPtr->find(uface3).toString(), expectedFace3Name);
+    const char* expectedFace3Name = "Face6;:M2;FUS;:H1:8,F";
+    EXPECT_EQ(unionPart.elementMapPtr->find(uface3).toString(), expectedFace3Name);
     auto serializedResult = finalSs.str();
+    const char* expectedNameOfTopFaceOfCubeSide = "Unnamed#Fusion.;Face6;:M2;FUS;:H1:8,F.Face3";
     EXPECT_EQ(serializedResult, expectedNameOfTopFaceOfCubeSide);
 
     // explanation of "Fusion.;Face6;:M2;FUS;:H2:3,F.Face3"  toponame
