@@ -19,11 +19,13 @@ public:
 class ElementMapTest: public ::testing::Test
 {
 protected:
-    void SetUp() override {
+    static void SetUpTestSuite() {
         int argc = 1;
         char *argv[] = { "FreeCAD" };
         App::Application::Config()["ExeName"] = "FreeCAD";
         App::Application::init(argc, argv);
+    }
+    void SetUp() override {
         App::GetApplication().newDocument("test", "testUser");
         sids = &_sid;
     }
