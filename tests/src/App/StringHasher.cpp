@@ -1295,9 +1295,9 @@ TEST_F(StringHasherTest, getIDFromCString)// NOLINT
  *   3. Raw data and non-raw
  *   4. Postfix contains # and not
  *   5. Indexed name and not
- *   6. sids empty and sids with content
- *   7. sids whose hasher==this and whose hasher is something else
- *   8. If sids.size() > 10, duplicates get removed
+ *   6. _sids empty and _sids with content
+ *   7. _sids whose hasher==this and whose hasher is something else
+ *   8. If _sids.size() > 10, duplicates get removed
  */
 
 TEST_F(StringHasherTest, getIDFromMappedNameWithoutPostfixWithoutIndex)// NOLINT
