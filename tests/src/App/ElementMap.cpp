@@ -200,6 +200,44 @@ TEST_F(ElementMapTest, mimicSimpleUnion)
     // "Face3" is the localized name
 }
 
+TEST_F(ElementMapTest, mimicOperationAgainstSelf)
+{
+    // Arrange
+    //   pattern: new doc, create Cube, Mystery Op with self as target
+    std::ostringstream ss;
+    LessComplexPart finalPart(99L, "MysteryOp", _hasher);
+    // we are only going to simulate one face for testing purpose
+    Data::IndexedName uface3("Face", 3);
+    auto PartOp = "MYS";
+    auto ownFace6 = finalPart.elementMapPtr->getAll()[5];
+    Data::MappedName uface3Holder(ownFace6.index);
+    auto workbenchId = std::string(Data::POSTFIX_MOD) + "9999";
+
+    // Act
+    //   act: with the mystery op, name against its own Face6 for some reason
+    Data::MappedName postfixHolder(workbenchId);
+    finalPart.elementMapPtr->encodeElementName(
+        postfixHolder[0], postfixHolder, ss, nullptr, finalPart.Tag, nullptr, finalPart.Tag);
+    auto postfixStr = postfixHolder.toString() + Data::ELEMENT_MAP_PREFIX + PartOp;
+    // we will invoke the encoder for face 3
+    finalPart.elementMapPtr->encodeElementName(
+        uface3Holder[0], uface3Holder, ss, nullptr, finalPart.Tag, postfixStr.c_str(), finalPart.Tag);
+    finalPart.elementMapPtr->setElementName(uface3, uface3Holder, finalPart.Tag, nullptr, false); // override not forced
+
+    // Assert
+    EXPECT_EQ(postfixStr, ":M9999;MYS");
+    EXPECT_EQ(finalPart.elementMapPtr->find(uface3).toString(), "Face3"); // the override was not forced
+    EXPECT_EQ(uface3Holder.toString(), "Face6;:M9999;MYS;:H63:b,F");
+    // explaining ";Face6;:M2;MYS;:H2:3,F" name:
+    //
+    // ";Face6" means default inheritance comes from face 6 of the ownFace6 (which is itself)
+    // ";:M9999" means that a Workbench op has happened. "M" is the "Mod" directory in the source tree?
+    // ";MYS" means that a "Mystery" operation has happened. Notice the lack of a colon.
+    // ";:H63" means the subtending object (cylinder) has a tag of 99 (63 in hex)
+    // ":b" means the writing position is b (hex); literally how far into the current postfix we are
+    // ",F" means are of type "F" which is short for "Face" of Face3 of Fusion.
+}
+
 TEST_F(ElementMapTest, hasChildElementMapTest)
 {
     // Arrange
