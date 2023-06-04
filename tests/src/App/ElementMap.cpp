@@ -2,8 +2,8 @@
 
 #include "gtest/gtest.h"
 
-#include "App/ElementMap.h"
 #include <App/Application.h>
+#include <App/ElementMap.h>
 
 // NOLINTBEGIN(readability-magic-numbers)
 
@@ -20,12 +20,12 @@ public:
         // object also have Vertexes etc and the face count varies; but that is not important
         // here since we are not testing a real model
         // the "MappedName" is left blank for now
-        auto face1 = Data::IndexedName("Face", 1);
-        auto face2 = Data::IndexedName("Face", 2);
-        auto face3 = Data::IndexedName("Face", 3);
-        auto face4 = Data::IndexedName("Face", 4);
-        auto face5 = Data::IndexedName("Face", 5);
-        auto face6 = Data::IndexedName("Face", 6);
+        Data::IndexedName face1("Face", 1);
+        Data::IndexedName face2("Face", 2);
+        Data::IndexedName face3("Face", 3);
+        Data::IndexedName face4("Face", 4);
+        Data::IndexedName face5("Face", 5);
+        Data::IndexedName face6("Face", 6);
         elementMapPtr->hasher = hasher;
         elementMapPtr->setElementName(face1, Data::MappedName(face1), Tag);
         elementMapPtr->setElementName(face2, Data::MappedName(face2), Tag);
