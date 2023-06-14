@@ -197,15 +197,15 @@ TEST_F(ElementMapTest, eraseIndexedName)
 
     // Act
     auto sizeBefore = elementMap.size();
-    auto eraseResult = elementMap.erase(element2);
+    elementMap.erase(element2);
     auto sizeAfter = elementMap.size();
-    auto eraseAfterResult = elementMap.erase(element2);
+    elementMap.erase(element2);
+    auto sizeAfterRepeat = elementMap.size();
 
     // Assert
-    EXPECT_EQ(eraseResult, true);
     EXPECT_EQ(sizeBefore, 4);
-    EXPECT_EQ(eraseAfterResult, false);
     EXPECT_EQ(sizeAfter, 2);
+    EXPECT_EQ(sizeAfterRepeat, 2);
 }
 
 TEST_F(ElementMapTest, findMappedName)

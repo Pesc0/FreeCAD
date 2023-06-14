@@ -681,19 +681,19 @@ bool ElementMap::erase(const MappedName& name)
     return true;
 }
 
-bool ElementMap::erase(const IndexedName& idx)
+void ElementMap::erase(const IndexedName& idx)
 {
     auto iter = this->indexedNames.find(idx.getType());
     if (iter == this->indexedNames.end())
-        return false;
+        return;
     auto& indices = iter->second;
     if (idx.getIndex() >= (int)indices.names.size())
-        return false;
+        return;
     auto& ref = indices.names[idx.getIndex()];
     for (auto* r = &ref; r; r = r->next.get())
         this->mappedNames.erase(r->name);
     ref.clear();
-    return true;
+    return;
 }
 
 unsigned long ElementMap::size() const

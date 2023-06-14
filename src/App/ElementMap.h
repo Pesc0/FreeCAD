@@ -130,7 +130,7 @@ public:
     bool erase(const MappedName& name);
 
     /// Remove \c idx and all the MappedNames associated with it
-    bool erase(const IndexedName& idx);
+    void erase(const IndexedName& idx);
 
     unsigned long size() const;
 
