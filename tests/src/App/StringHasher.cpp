@@ -998,7 +998,7 @@ TEST_F(StringIDRefTest, toBytes)  // NOLINT
     auto ref = App::StringIDRef(createStringID());
 
     // Act
-    ref.toBytes(byteStorage);
+    byteStorage = ref.toBytes();
 
     // Assert
     EXPECT_FALSE(byteStorage.isNull());

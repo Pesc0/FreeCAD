@@ -556,12 +556,12 @@ public:
         return false;
     }
 
-    void toBytes(QByteArray& bytes) const
+    QByteArray toBytes() const
     {
-        // TODO: return the QByteArray instead of passing in by reference
         if (_sid) {
-            bytes = _sid->dataToBytes(_index);
+            return _sid->dataToBytes(_index);
         }
+        return QByteArray();
     }
 
     PyObject* getPyObject()
