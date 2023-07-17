@@ -373,7 +373,7 @@ char ComplexGeoData::elementType(const char* name) const
             type = dot + 1;
         }
         else {
-            mappedName = MappedName(name);
+            mappedName = MappedName(name, std::string::npos, false);
         }
         char res = elementType(mappedName);
         if (res != 0) {

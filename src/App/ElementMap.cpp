@@ -995,12 +995,12 @@ void ElementMap::hashChildMaps(long masterTag)
             auto& child = indexedChild.second;
             size_t len = 0;
             long tag = 0;
-            size_t pos = MappedName(child.postfix, child.postfix.size())
+            size_t pos = MappedName(child.postfix, child.postfix.size(), false)
                           .findTagInElementName(&tag, &len, nullptr, nullptr, false, false);
             // 10 = minimum strlen to invoke hasher
             if (pos != std::string::npos && pos > 10) {
                 MappedName postfix = hashElementName(
-                    MappedName(child.postfix.constData(), pos), child.sids);
+                    MappedName(child.postfix.constData(), pos, false), child.sids);
                 ss.str("");
                 ss << MAPPED_CHILD_ELEMENTS_PREFIX << postfix;
                 MappedName tmp;

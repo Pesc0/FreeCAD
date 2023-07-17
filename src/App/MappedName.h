@@ -46,8 +46,8 @@ namespace Data
 class AppExport MappedName
 {
 public:
-    explicit MappedName(const std::string& name);
-    explicit MappedName(const char* name, size_t size = std::string::npos);
+    explicit MappedName(const std::string& name, bool discard_prefix = true);
+    explicit MappedName(const char* name, size_t size = std::string::npos, bool discard_prefix = true);
     explicit MappedName(const IndexedName& element);
     explicit MappedName(const App::StringIDRef& sid);
 

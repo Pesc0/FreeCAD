@@ -28,9 +28,9 @@
 using namespace Data;
 
 
-MappedName::MappedName(const std::string& name)
+MappedName::MappedName(const std::string& name, bool discard_prefix)
 {
-    if (boost::starts_with(name, ELEMENT_MAP_PREFIX)) {
+    if (boost::starts_with(name, ELEMENT_MAP_PREFIX) && discard_prefix) {
         data = name.substr(ELEMENT_MAP_PREFIX_SIZE);
     }
     else {
@@ -39,8 +39,8 @@ MappedName::MappedName(const std::string& name)
     postfixStartIdx = data.asConst().size();
 }
 
-MappedName::MappedName(const char* name, size_t size)
-    : MappedName(size != std::string::npos ? std::string(name, size) : std::string(name))
+MappedName::MappedName(const char* name, size_t size, bool discard_prefix)
+    : MappedName(size != std::string::npos ? std::string(name, size) : std::string(name), discard_prefix)
 {}
 
 MappedName::MappedName(const IndexedName& element)
