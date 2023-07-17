@@ -153,7 +153,7 @@ void ElementMap::save(std::ostream& stream, int index,
 
                 ::App::StringID::IndexID prefixID {};
                 prefixID.id = 0;
-                IndexedName idx(ref->name.dataBytes());
+                IndexedName idx(ref->name.name().c_str());
                 bool printName = true;
                 if (idx) {
                     auto key = QByteArray::fromRawData(idx.getType(),
@@ -165,13 +165,13 @@ void ElementMap::save(std::ostream& stream, int index,
                     }
                 }
                 else {
-                    prefixID = ::App::StringID::fromString(ref->name.dataBytes());
+                    prefixID = ::App::StringID::fromString(ref->name.name().c_str());
                     if (prefixID.id != 0) {
                         for (auto& sid : ref->sids) {
                             if (sid.isMarked() && sid.value() == prefixID.id) {
                                 stream << '$';
-                                stream.write(ref->name.dataBytes().constData(),
-                                             ref->name.dataBytes().size());
+                                stream.write(ref->name.name().c_str(),
+                                             ref->name.name().size());
                                 printName = false;
                                 break;
                             }
@@ -183,10 +183,10 @@ void ElementMap::save(std::ostream& stream, int index,
                 }
                 if (printName) {
                     stream << ';';
-                    stream.write(ref->name.dataBytes().constData(), ref->name.dataBytes().size());
+                    stream.write(ref->name.name().c_str(), ref->name.name().size());
                 }
 
-                const QByteArray& postfix = ref->name.postfixBytes();
+                const QByteArray& postfix = ref->name.postfix().c_str();
                 if (postfix.isEmpty()) {
                     stream << ".0";
                 }
@@ -419,7 +419,7 @@ ElementMapPtr ElementMap::restore(::App::StringHasherRef hasherRef, std::istream
                     }
                     case '$':
                         ref->name = MappedName(tokens[0].c_str() + 1);
-                        prefixID = ::App::StringID::fromString(ref->name.dataBytes());
+                        prefixID = ::App::StringID::fromString(QByteArray(ref->name.name().c_str()));
                         break;
                     case ';':
                         ref->name = MappedName(tokens[0].c_str() + 1);
@@ -494,7 +494,7 @@ MappedName ElementMap::addName(MappedName& name, const IndexedName& idx, const E
                                bool overwrite, IndexedName* existing)
 {
     if (FC_LOG_INSTANCE.isEnabled(FC_LOGLEVEL_LOG)) {
-        if (name.find("#") >= 0 && name.findTagInElementName() < 0) {
+        if (name.find("#") != std::string::npos && name.findTagInElementName() == std::string::npos) {
             FC_ERR("missing tag postfix " << name);// NOLINT
         }
     }
@@ -504,7 +504,7 @@ MappedName ElementMap::addName(MappedName& name, const IndexedName& idx, const E
         }
         auto ret = mappedNames.insert(std::make_pair(name, idx));
         if (ret.second) {              // element just inserted did not exist yet in the map
-            ret.first->first.compact();// FIXME see MappedName.cpp
+            //ret.first->first.compact();// FIXME see MappedName.cpp
             mappedRef(idx).append(ret.first->first, sids);
             FC_TRACE(idx << " -> " << name);// NOLINT
             return ret.first->first;
@@ -669,7 +669,7 @@ MappedName ElementMap::hashElementName(const MappedName& name, ElementIDRefs& si
     if (!this->hasher || !name) {
         return name;
     }
-    if (name.find(ELEMENT_MAP_PREFIX) < 0) {
+    if (name.find(ELEMENT_MAP_PREFIX) == std::string::npos) {
         return name;
     }
     App::StringIDRef sid = this->hasher->getID(name, sids);
@@ -699,7 +699,7 @@ MappedName ElementMap::dehashElementName(const MappedName& name) const
     if (!this->hasher) {
         return name;
     }
-    auto id = App::StringID::fromString(name.toRawBytes());
+    auto id = App::StringID::fromString(name.toString().c_str());
     if (!id) {
         return name;
     }
@@ -797,11 +797,11 @@ IndexedName ElementMap::find(const MappedName& name, ElementIDRefs* sids) const
             return IndexedName();
         }
 
-        int len = 0;
-        if (name.findTagInElementName(nullptr, &len, nullptr, nullptr, false, false) < 0) {
+        size_t len = 0;
+        if (name.findTagInElementName(nullptr, &len, nullptr, nullptr, false, false) == std::string::npos) {
             return IndexedName();
         }
-        QByteArray key = name.toRawBytes(len);
+        QByteArray key = QByteArray(name.toString().substr(len).c_str()); //FIXME is this correct?
         auto it = this->childElements.find(key);
         if (it == this->childElements.end()) {
             return IndexedName();
@@ -810,7 +810,7 @@ IndexedName ElementMap::find(const MappedName& name, ElementIDRefs* sids) const
         const auto& child = *it.value().childMap;
         IndexedName res;
 
-        MappedName childName = MappedName::fromRawData(name, 0, len);
+        MappedName childName = MappedName(name, 0, len);
         if (child.elementMap) {
             res = child.elementMap->find(childName, sids);
         }
@@ -993,21 +993,21 @@ void ElementMap::hashChildMaps(long masterTag)
     for (auto& indexedNameIndexedElements : this->indexedNames) {
         for (auto& indexedChild : indexedNameIndexedElements.second.children) {
             auto& child = indexedChild.second;
-            int len = 0;
+            size_t len = 0;
             long tag = 0;
-            int pos = MappedName::fromRawData(child.postfix)
+            size_t pos = MappedName(child.postfix, child.postfix.size())
                           .findTagInElementName(&tag, &len, nullptr, nullptr, false, false);
-            // TODO: What is this 10?
-            if (pos > 10) {
+            // 10 = minimum strlen to invoke hasher
+            if (pos != std::string::npos && pos > 10) {
                 MappedName postfix = hashElementName(
-                    MappedName::fromRawData(child.postfix.constData(), pos), child.sids);
+                    MappedName(child.postfix.constData(), pos), child.sids);
                 ss.str("");
                 ss << MAPPED_CHILD_ELEMENTS_PREFIX << postfix;
                 MappedName tmp;
                 encodeElementName(
                     child.indexedName[0], tmp, ss, nullptr, masterTag, nullptr, child.tag, true);
                 this->childElements.remove(child.postfix);
-                child.postfix = tmp.toBytes();
+                child.postfix = QByteArray(tmp.toString().c_str(), tmp.toString().size());
                 this->childElements[child.postfix].childMap = &child;
             }
         }
@@ -1039,7 +1039,7 @@ void ElementMap::collectChildMaps(std::map<const ElementMap*, int>& childMapSet,
     }
 
     for (auto& mappedName : this->mappedNames) {
-        addPostfix(mappedName.first.constPostfix(), postfixMap, postfixes);
+        addPostfix(mappedName.first.postfix().c_str(), postfixMap, postfixes);
     }
 
     childMaps.push_back(this);
@@ -1167,7 +1167,7 @@ void ElementMap::addChildElements(long masterTag, const std::vector<MappedChildE
 
             // Perform some disambiguation in case the same shape is mapped
             // multiple times, e.g. draft array.
-            entry = &childElements[tmp.toBytes()];
+            entry = &childElements[QByteArray(tmp.toString().c_str())];
             int mapIndex = entry->mapIndices[child.elementMap.get()]++;
             ++entry->index;
             if (entry->index != 1 && child.elementMap && mapIndex == 0) {
@@ -1220,7 +1220,7 @@ void ElementMap::addChildElements(long masterTag, const std::vector<MappedChildE
                               child.tag,
                               true);
 
-            entry = &childElements[tmp.toBytes()];
+            entry = &childElements[QByteArray(tmp.toString().c_str())];
             if (entry->childMap) {
                 FC_ERR("duplicate mapped child element");// NOLINT
                 continue;
@@ -1232,14 +1232,14 @@ void ElementMap::addChildElements(long masterTag, const std::vector<MappedChildE
             child.indexedName.getIndex() + child.offset + child.count, child);
         if (!res.second) {
             if (!entry->childMap) {
-                this->childElements.remove(tmp.toBytes());
+                this->childElements.remove(QByteArray(tmp.toString().c_str()));
             }
             FC_ERR("duplicate mapped child element");// NOLINT
             continue;
         }
 
         auto& insertedChild = res.first->second;
-        insertedChild.postfix = tmp.toBytes();
+        insertedChild.postfix = QByteArray(tmp.toString().c_str());
         entry->childMap = &insertedChild;
         childElementSize += insertedChild.count;
     }
@@ -1288,9 +1288,9 @@ long ElementMap::getElementHistory(const MappedName& name, long masterTag, Mappe
                                    std::vector<MappedName>* history) const
 {
     long tag = 0;
-    int len = 0;
-    int pos = name.findTagInElementName(&tag, &len, nullptr, nullptr, true);
-    if (pos < 0) {
+    size_t len = 0;
+    size_t pos = name.findTagInElementName(&tag, &len, nullptr, nullptr, true);
+    if (pos  == std::string::npos) {
         if (original) {
             *original = name;
         }
@@ -1304,7 +1304,7 @@ long ElementMap::getElementHistory(const MappedName& name, long masterTag, Mappe
     MappedName& ret = original ? *original : tmp;
     if (name.startsWith(ELEMENT_MAP_PREFIX)) {
         unsigned offset = ELEMENT_MAP_PREFIX_SIZE;
-        ret = MappedName::fromRawData(name, static_cast<int>(offset));
+        ret = MappedName(name, static_cast<int>(offset));
     }
     else {
         ret = name;
@@ -1318,25 +1318,25 @@ long ElementMap::getElementHistory(const MappedName& name, long masterTag, Mappe
         bool deHashed = false;
         if (ret.startsWith(MAPPED_CHILD_ELEMENTS_PREFIX, len)) {
             int offset = (int)POSTFIX_TAG_SIZE;
-            MappedName tmp2 = MappedName::fromRawData(ret, len + offset, pos - len - offset);
+            MappedName tmp2 = MappedName(ret, len + offset, pos - len - offset);
             MappedName postfix = dehashElementName(tmp2);
             if (postfix != tmp2) {
                 deHashed = true;
-                ret = MappedName::fromRawData(ret, 0, len) + postfix;
+                ret = MappedName(ret, 0, len) + postfix;
             }
         }
         if (!deHashed) {
-            ret = dehashElementName(MappedName::fromRawData(ret, 0, len));
+            ret = dehashElementName(MappedName(ret, 0, len));
         }
 
         long tag2 = 0;
         pos = ret.findTagInElementName(&tag2, &len, nullptr, nullptr, true);
-        if (pos < 0 || (tag2 != tag && tag2 != -tag && tag != masterTag && -tag != masterTag)) {
+        if (pos == std::string::npos || (tag2 != tag && tag2 != -tag && tag != masterTag && -tag != masterTag)) {
             return tag;
         }
         tag = tag2;
         if (history) {
-            history->push_back(ret.copy());
+            history->push_back(ret);
         }
     }
 }

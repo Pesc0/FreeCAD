@@ -300,13 +300,12 @@ TEST_F(ComplexGeoDataTest, elementTypeCharIndexedName)  // NOLINT
 TEST_F(ComplexGeoDataTest, elementTypeCharMappedNameNoPrefix)  // NOLINT
 {
     // Arrange
-    int size {0};
     Data::MappedName mappedName;
     Data::IndexedName indexedName;
     std::tie(indexedName, mappedName) = createMappedName("TestMappedName:;");
 
     // Act
-    char elementType = cgd().elementType(mappedName.toConstString(0, size));
+    char elementType = cgd().elementType(mappedName.toString().c_str());
 
     // Assert
     EXPECT_EQ(elementType, 'E');
@@ -315,14 +314,13 @@ TEST_F(ComplexGeoDataTest, elementTypeCharMappedNameNoPrefix)  // NOLINT
 TEST_F(ComplexGeoDataTest, elementTypeCharMappedNameWithPrefix)  // NOLINT
 {
     // Arrange
-    int size {0};
     Data::MappedName mappedName;
     Data::IndexedName indexedName;
     auto name = fmt::format("{}TestMappedElement:;", Data::ELEMENT_MAP_PREFIX);
     std::tie(indexedName, mappedName) = createMappedName(name);
 
     // Act
-    char elementType = cgd().elementType(mappedName.toConstString(0, size));
+    char elementType = cgd().elementType(mappedName.toString().c_str());
 
     // Assert
     EXPECT_EQ(elementType, 'E');

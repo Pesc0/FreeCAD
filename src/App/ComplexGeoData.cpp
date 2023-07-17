@@ -228,8 +228,7 @@ IndexedName ComplexGeoData::getIndexedName(const MappedName& name, ElementIDRefs
         return IndexedName();
     }
     if (!_elementMap) {
-        std::string str;
-        return {name.appendToBuffer(str), getElementTypes()};
+        return {name.toString().c_str(), getElementTypes()};
     }
     return _elementMap->find(name, sid);
 }
@@ -318,8 +317,8 @@ char ComplexGeoData::elementType(const Data::MappedName& name) const
     if (indexedName) {
         return elementType(indexedName);
     }
-    char element_type = 0;
-    if (name.findTagInElementName(nullptr, nullptr, nullptr, &element_type) < 0) {
+    char element_type=0;
+    if (name.findTagInElementName(nullptr,nullptr,nullptr,&element_type) == std::string::npos) {
         return elementType(name.toIndexedName());
     }
     return element_type;
@@ -374,7 +373,7 @@ char ComplexGeoData::elementType(const char* name) const
             type = dot + 1;
         }
         else {
-            mappedName = MappedName::fromRawData(name);
+            mappedName = MappedName(name);
         }
         char res = elementType(mappedName);
         if (res != 0) {

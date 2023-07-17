@@ -301,13 +301,13 @@ StringIDRef StringHasher::getID(const QByteArray& data, Options options)
 StringIDRef StringHasher::getID(const Data::MappedName& name, const QVector<StringIDRef>& sids)
 {
     StringID tempID;
-    tempID._postfix = name.postfixBytes();
+    tempID._postfix = QByteArray(name.postfix().c_str(), name.postfix().size());
 
     Data::IndexedName indexed;
     if (tempID._postfix.size() != 0) {
         // Only check for IndexedName if there is postfix, because of the way
         // we restore the StringID. See StringHasher::saveStream/restoreStreamNew()
-        indexed = Data::IndexedName(name.dataBytes());
+        indexed = Data::IndexedName(QByteArray(name.name().c_str()));
     }
     if (indexed) {
         // If this is an IndexedName, then _data only stores the base part of the name, without the
@@ -317,7 +317,7 @@ StringIDRef StringHasher::getID(const Data::MappedName& name, const QVector<Stri
     }
     else {
         // Store the entire name in _data, but temporarily re-use the existing memory
-        tempID._data = name.dataBytes();
+        tempID._data = QByteArray(name.name().c_str(), name.name().size());
     }
 
     // Check to see if there is already an entry in the hash table for this StringID
@@ -330,16 +330,16 @@ StringIDRef StringHasher::getID(const Data::MappedName& name, const QVector<Stri
         return res;
     }
 
-    if (!indexed && name.isRaw()) {
+    if (!indexed) {
         // Make a copy of the memory if we didn't do so earlier
-        tempID._data = QByteArray(name.dataBytes().constData(), name.dataBytes().size());
+        tempID._data = QByteArray(name.name().c_str(), name.name().size());
     }
 
     // If the postfix is not already encoded, use getID to encode it:
     StringIDRef postfixRef;
     if ((tempID._postfix.size() != 0) && tempID._postfix.indexOf("#") < 0) {
         postfixRef = getID(tempID._postfix);
-        postfixRef.toBytes(tempID._postfix);
+        tempID._postfix = postfixRef.toBytes();
     }
 
     // If _data is an IndexedName, use getID to encode it:
