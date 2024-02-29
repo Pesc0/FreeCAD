@@ -98,6 +98,7 @@ SetLibraryVersions()
 SetGlobalCompilerAndLinkerSettings()
 
 add_subdirectory(src)
+add_subdirectory(tools/package/MacAppBundle) # "if" clause moved into local CMakeLists.txt file to support Conda and Homebrew builds
 add_subdirectory(data)
 
 BuildAndInstallDesignerPlugin()
