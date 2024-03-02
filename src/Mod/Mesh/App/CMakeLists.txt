@@ -5,7 +5,7 @@ endif(WIN32)
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_SOURCE_DIR}/src/3rdParty/libkdtree
+    ${CMAKE_SOURCE_DIR}/lib/libkdtree
     ${Boost_INCLUDE_DIRS}
     ${PYTHON_INCLUDE_DIRS}
     ${XercesC_INCLUDE_DIRS}

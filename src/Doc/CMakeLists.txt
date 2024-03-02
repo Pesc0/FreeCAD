@@ -35,7 +35,7 @@ if(DOXYGEN_FOUND)
     SET(DOXYGEN_SOURCE_DIR ${COIN3D_INCLUDE_DIRS}/Inventor/fields/SoSubField.h 
                            ${CMAKE_SOURCE_DIR}/src/CXX 
                            ${CMAKE_SOURCE_DIR}/src/zipios++ 
-                           ${CMAKE_SOURCE_DIR}/src/3rdParty
+                           ${CMAKE_SOURCE_DIR}/lib
                            ${CMAKE_SOURCE_DIR}/src/Build 
                            ${CMAKE_SOURCE_DIR}/src/Base 
                            ${CMAKE_BINARY_DIR}/src/Base 

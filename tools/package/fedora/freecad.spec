@@ -22,7 +22,7 @@
 # Prevent RPM from doing its magical 'build' directory for now
 %global __cmake_in_source_build 0
 
-# See FreeCAD-main/src/3rdParty/salomesmesh/CMakeLists.txt to find this out.
+# See FreeCAD-main/lib/salomesmesh/CMakeLists.txt to find this out.
 %global bundled_smesh_version 7.7.1.0
 
 # Some plugins go in the Mod folder instead of lib. Deal with those here:

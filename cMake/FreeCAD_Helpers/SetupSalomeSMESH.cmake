@@ -1,10 +1,10 @@
 macro(SetupSalomeSMESH)
 # -------------------------------- Salome SMESH --------------------------
 
-    # Salome SMESH sources are under src/3rdParty now
+    # Salome SMESH sources are under lib now
     if(BUILD_SMESH)
         # set the internal smesh version:
-        # see src/3rdParty/salomonemesh/CMakeLists.txt and commit https://github.com/FreeCAD/FreeCAD/commit/666a3e5 and https://forum.freecad.org/viewtopic.php?f=10&t=30838
+        # see lib/salomonemesh/CMakeLists.txt and commit https://github.com/FreeCAD/FreeCAD/commit/666a3e5 and https://forum.freecad.org/viewtopic.php?f=10&t=30838
         set(SMESH_VERSION_MAJOR 7)
         set(SMESH_VERSION_MINOR 7)
         set(SMESH_VERSION_PATCH 1)
@@ -115,7 +115,7 @@ macro(SetupSalomeSMESH)
                     message( WARNING "ompi-cxx was not found. Check for error above.")
                 endif()
             endif()
-            set(SMESH_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/src/3rdParty/salomesmesh/inc)
+            set(SMESH_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/lib/salomesmesh/inc)
 
         else(NOT FREECAD_USE_EXTERNAL_SMESH)
             find_package(SMESH CONFIG)

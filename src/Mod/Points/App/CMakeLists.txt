@@ -10,8 +10,8 @@ include_directories(
     ${PYTHON_INCLUDE_DIRS}
     ${XercesC_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIR}
-    ${CMAKE_BINARY_DIR}/src/3rdParty/libE57Format
-    ${CMAKE_SOURCE_DIR}/src/3rdParty/libE57Format/include
+    ${CMAKE_BINARY_DIR}/lib/libE57Format
+    ${CMAKE_SOURCE_DIR}/lib/libE57Format/include
 )
 
 set(Points_LIBS
@@ -63,7 +63,7 @@ endif(FREECAD_USE_PCH)
 
 add_library(Points SHARED ${Points_SRCS} ${Points_Scripts})
 
-link_directories(${CMAKE_BINARY_DIR}/src/3rdParty/libE57Format)
+link_directories(${CMAKE_BINARY_DIR}/lib/libE57Format)
 
 target_link_libraries(Points E57Format ${Points_LIBS})
 

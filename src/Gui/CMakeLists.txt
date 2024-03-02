@@ -51,7 +51,7 @@ include_directories(
 
 if(MSVC)
     include_directories(
-        ${CMAKE_SOURCE_DIR}/src/3rdParty/OpenGL/api
+        ${CMAKE_SOURCE_DIR}/lib/OpenGL/api
     )
 endif(MSVC)
 

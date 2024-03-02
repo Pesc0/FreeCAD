@@ -33,7 +33,7 @@ macro(FreeCADLibpackChecks)
 # -------------------------------- Salome SMESH --------------------------
 
         if(NOT FREECAD_USE_EXTERNAL_SMESH)
-            set(SMESH_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/src/3rdParty/salomesmesh/inc)
+            set(SMESH_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/lib/salomesmesh/inc)
         endif()
 
     endif(FREECAD_LIBPACK_USE)
