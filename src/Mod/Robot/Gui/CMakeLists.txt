@@ -9,6 +9,7 @@ include_directories(
     ${EIGEN3_INCLUDE_DIR}
     ${PYTHON_INCLUDE_DIRS}
     ${XercesC_INCLUDE_DIRS}
+    ${PYCXX_INCLUDE_DIR}
 )
 link_directories(${OCC_LIBRARY_DIR})
 

@@ -10,6 +10,7 @@ include_directories(
     ${PYTHON_INCLUDE_DIRS}
     ${XercesC_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIR}
+    ${PYCXX_INCLUDE_DIR}
 )
 
 set(SurfaceGui_LIBS

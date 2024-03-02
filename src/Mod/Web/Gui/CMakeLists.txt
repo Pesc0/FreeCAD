@@ -5,6 +5,7 @@ include_directories(
     ${ZLIB_INCLUDE_DIR}
     ${PYTHON_INCLUDE_DIRS}
     ${XercesC_INCLUDE_DIRS}
+    ${PYCXX_INCLUDE_DIR}
 )
 
 if (QtWebEngineWidgets_FOUND)

@@ -7,6 +7,7 @@ include_directories(
     ${ZLIB_INCLUDE_DIR}
     ${XercesC_INCLUDE_DIRS}
     ${PYTHON_INCLUDE_DIRS}
+    ${PYCXX_INCLUDE_DIR}
 )
 
 link_directories(${OCC_LIBRARY_DIR})

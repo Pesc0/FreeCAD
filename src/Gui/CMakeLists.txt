@@ -47,6 +47,7 @@ include_directories(
     ${XercesC_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIR}
     ${3DCONNEXION_INCLUDE_DIR}
+    ${PYCXX_INCLUDE_DIR}
 )
 
 if(MSVC)

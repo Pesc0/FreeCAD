@@ -17,6 +17,7 @@ include_directories(
     ${XercesC_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIR}
     ${YAML_CPP_INCLUDE_DIR}
+    ${PYCXX_INCLUDE_DIR}
 )
 link_directories(${YAML_CPP_LIBRARY_DIR})
 

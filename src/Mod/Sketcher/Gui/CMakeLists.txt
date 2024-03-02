@@ -10,6 +10,7 @@ include_directories(
     ${ZLIB_INCLUDE_DIR}
     ${XercesC_INCLUDE_DIRS}
     ${EIGEN3_INCLUDE_DIR}
+    ${PYCXX_INCLUDE_DIR}
 )
 link_directories(${OCC_LIBRARY_DIR})
 

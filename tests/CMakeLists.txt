@@ -40,6 +40,7 @@ endif()
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${PYCXX_INCLUDE_DIR}
 )
 
 set(CMAKE_AUTOMOC ON)
@@ -61,7 +62,8 @@ function(setup_qt_test)
             ${QtGui_INCLUDE_DIRS}
             ${QtWidgets_INCLUDE_DIRS}
             ${QtTest_INCLUDE_DIRS}
-            ${COIN3D_INCLUDE_DIRS})
+            ${COIN3D_INCLUDE_DIRS}
+            ${PYCXX_INCLUDE_DIR})
         target_link_libraries(${_testname}_Tests_run
             FreeCADApp
             FreeCADGui
@@ -109,6 +111,7 @@ add_subdirectory(src)
 target_include_directories(Tests_run PUBLIC
     ${Python3_INCLUDE_DIRS}
     ${XercesC_INCLUDE_DIRS}
+    ${PYCXX_INCLUDE_DIR}
 )
 target_link_libraries(Tests_run
     gtest_main

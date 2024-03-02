@@ -27,6 +27,7 @@ include_directories(
     ${SMESH_INCLUDE_DIR}
     ${NETGEN_INCLUDE_DIRS}
     ${VTK_INCLUDE_DIRS}
+    ${PYCXX_INCLUDE_DIR}
 )
 
 

@@ -4,6 +4,7 @@ include_directories(
     ${Boost_INCLUDE_DIRS}
     ${PYTHON_INCLUDE_DIRS}
     ${XercesC_INCLUDE_DIRS}
+    ${PYCXX_INCLUDE_DIR}
 )
 
 set(TestGui_LIBS

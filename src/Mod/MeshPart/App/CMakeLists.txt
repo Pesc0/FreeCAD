@@ -19,6 +19,7 @@ include_directories(
     ${SMESH_INCLUDE_DIR}
     ${VTK_INCLUDE_DIRS}
     ${EIGEN3_INCLUDE_DIR}
+    ${PYCXX_INCLUDE_DIR}
 )
 
 

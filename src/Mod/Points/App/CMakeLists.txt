@@ -12,6 +12,7 @@ include_directories(
     ${ZLIB_INCLUDE_DIR}
     ${CMAKE_BINARY_DIR}/lib/libE57Format
     ${CMAKE_SOURCE_DIR}/lib/libE57Format/include
+    ${PYCXX_INCLUDE_DIR}
 )
 
 set(Points_LIBS

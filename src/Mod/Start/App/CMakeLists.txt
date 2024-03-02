@@ -3,6 +3,7 @@ include_directories(
     ${OCC_INCLUDE_DIR}
     ${ZLIB_INCLUDE_DIR}
     ${PYTHON_INCLUDE_DIRS}
+    ${PYCXX_INCLUDE_DIR}
 )
 
 set(Start_LIBS

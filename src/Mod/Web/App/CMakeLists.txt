@@ -5,6 +5,7 @@ include_directories(
     ${OCC_INCLUDE_DIR}
     ${PYTHON_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIR}
+    ${PYCXX_INCLUDE_DIR}
 )
 
 include_directories(

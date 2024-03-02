@@ -11,6 +11,7 @@ include_directories(
     ${XercesC_INCLUDE_DIRS}
     ${QT_INCLUDE_DIR}
     ${CMAKE_SOURCE_DIR}/lib/json/single_include/nlohmann/
+    ${PYCXX_INCLUDE_DIR}
 )
 link_directories(${OCC_LIBRARY_DIR})
 

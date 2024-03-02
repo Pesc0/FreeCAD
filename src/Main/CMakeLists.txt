@@ -12,6 +12,7 @@ if(BUILD_GUI)
         ${QT_INCLUDE_DIR}
         ${PYTHON_INCLUDE_DIRS}
         ${XercesC_INCLUDE_DIRS}
+        ${PYCXX_INCLUDE_DIR}
     )
 else(BUILD_GUI)
     include_directories(
@@ -20,6 +21,7 @@ else(BUILD_GUI)
         ${QT_INCLUDE_DIR}
         ${PYTHON_INCLUDE_DIRS}
         ${XercesC_INCLUDE_DIRS}
+        ${PYCXX_INCLUDE_DIR}
     )
 endif(BUILD_GUI)
 
